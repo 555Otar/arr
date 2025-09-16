@@ -97,15 +97,6 @@
           material="src: #transparentVideo; transparent: true; opacity: 1.0; side: double; blending: additive;"
         ></a-plane>
 
-          <a-plane
-          id="plane3"
-          position="2 2 0"
-          rotation="0 0 0"
-          width="3"
-          height="3"
-          material="shader: transparent-video; src: #transparentVideo; side: double;"
-        ></a-plane>
-
         <!-- Debug box na środku markera -->
         <a-box
           position="0 0.1 0"
@@ -122,25 +113,6 @@
 
     <script>
 
-      // Custom shader dla WebM z przezroczystością
-      AFRAME.registerShader('transparent-video', {
-        schema: {
-          src: {type: 'map'}
-        },
-        init: function (data) {
-          const material = new THREE.MeshBasicMaterial({
-            map: data.src,
-            transparent: true,
-            alphaTest: 0.01,
-            side: THREE.DoubleSide
-          });
-          this.material = material;
-        },
-        update: function (data) {
-          this.material.map = data.src;
-          this.material.needsUpdate = true;
-        }
-      });
 
 
 
