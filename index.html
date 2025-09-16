@@ -85,7 +85,25 @@
           rotation="0 0 0"
           width="4"
           height="4"
-          material="src: #transparentVideo; transparent: true; alphaTest: 0.05; side: double;"
+          material="src: #transparentVideo; transparent: true; alphaTest: 0.01; side: double;blending: normal;"
+        ></a-plane>
+
+          <a-plane
+          id="plane2"
+          position="0 2 0"
+          rotation="0 0 0"
+          width="3"
+          height="3"
+          material="src: #transparentVideo; transparent: true; opacity: 1.0; side: double; blending: additive;"
+        ></a-plane>
+
+          <a-plane
+          id="plane3"
+          position="2 2 0"
+          rotation="0 0 0"
+          width="3"
+          height="3"
+          material="shader: transparent-video; src: #transparentVideo; side: double;"
         ></a-plane>
 
         <!-- Debug box na środku markera -->
@@ -97,21 +115,35 @@
           material="color: red; opacity: 0.8"
         ></a-box>
 
-        <!-- STABILNY tekst debug -->
-        <a-text
-          value="WebM Animation"
-          position="0 4.5 0"
-          align="center"
-          color="white"
-          width="8"
-        ></a-text>
-
       </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
 
     <script>
+
+      // Custom shader dla WebM z przezroczystością
+      AFRAME.registerShader('transparent-video', {
+        schema: {
+          src: {type: 'map'}
+        },
+        init: function (data) {
+          const material = new THREE.MeshBasicMaterial({
+            map: data.src,
+            transparent: true,
+            alphaTest: 0.01,
+            side: THREE.DoubleSide
+          });
+          this.material = material;
+        },
+        update: function (data) {
+          this.material.map = data.src;
+          this.material.needsUpdate = true;
+        }
+      });
+
+
+
       // Debug i error handling
       let debugDiv = document.getElementById('debugInfo');
       let errorDiv = document.getElementById('errorLog');
