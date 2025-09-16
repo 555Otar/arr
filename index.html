@@ -65,7 +65,7 @@
       <a-assets>
         <video
           id="transparentVideo"
-          src="skelet.webm"
+          src="twoj-plik.webm"
           autoplay
           loop="true"
           playsinline
@@ -76,26 +76,26 @@
         ></video>
       </a-assets>
 
-      <!-- Marker z przezroczystą animacją WebM - WIĘKSZA -->
+      <!-- Marker z przezroczystą animacją WebM - PROSTOPADŁA -->
       <a-marker preset="hiro" id="hiroMarker">
 
-        <!-- Główna animacja - DUŻA płaszczyzna pionowa -->
+        <!-- Główna animacja - PIONOWA płaszczyzna (prostopadła do ciebie) -->
         <a-plane
           position="0 2 0"
+          rotation="0 0 0"
           width="4"
           height="4"
           material="src: #transparentVideo; transparent: true; alphaTest: 0.05; side: double;"
         ></a-plane>
 
-        <!-- Alternatywnie - jeszcze większa -->
-        <a-plane
-          position="0 0 0"
-          rotation="-90 0 0"
-          width="6"
-          height="6"
-          material="src: #transparentVideo; transparent: true; alphaTest: 0.05; side: double;"
-          visible="false"
-        ></a-plane>
+        <!-- Debug box na środku markera -->
+        <a-box
+          position="0 0.1 0"
+          width="0.2"
+          height="0.2"
+          depth="0.2"
+          material="color: red; opacity: 0.8"
+        ></a-box>
 
         <!-- STABILNY tekst debug -->
         <a-text
@@ -104,18 +104,7 @@
           align="center"
           color="white"
           width="8"
-          geometry="primitive: plane; width: auto; height: auto"
-          material="color: black; opacity: 0.7"
         ></a-text>
-
-        <!-- Dodatkowy debug box żeby zobaczyć gdzie jest marker -->
-        <a-box
-          position="0 0.1 0"
-          width="0.2"
-          height="0.2"
-          depth="0.2"
-          material="color: red; opacity: 0.8"
-        ></a-box>
 
       </a-marker>
 
@@ -214,12 +203,21 @@
         updateDebug('Inicjalizacja zakończona');
       });
 
-      // Dodatkowy debug dla video
+      // Dodatkowy debug dla video + FIX dla odtwarzania
       const video = document.getElementById('transparentVideo');
       if (video) {
+        // FORCE autoplay przy wykryciu markera
+        document.querySelector('#hiroMarker').addEventListener('markerFound', () => {
+          console.log('Marker found - forcing video play');
+          video.currentTime = 0;
+          video.play().catch(e => console.log('Play failed:', e));
+        });
+
         video.addEventListener('loadeddata', () => {
           console.log('Video loaded:', video.videoWidth + 'x' + video.videoHeight);
           updateDebug(`Video: ${video.videoWidth}x${video.videoHeight}`);
+          // Force play
+          video.play().catch(e => console.log('Initial play failed:', e));
         });
 
         video.addEventListener('error', (e) => {
@@ -228,8 +226,18 @@
         });
 
         video.addEventListener('canplay', () => {
-          console.log('Video can play');
+          console.log('Video can play - attempting autoplay');
           updateDebug('Video gotowe do odtwarzania');
+          video.play().catch(e => console.log('Autoplay blocked:', e));
+        });
+
+        video.addEventListener('play', () => {
+          console.log('Video started playing');
+          updateDebug('Video GRA!');
+        });
+
+        video.addEventListener('pause', () => {
+          console.log('Video paused');
         });
       }
       setTimeout(() => {
