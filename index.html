@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR Video</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      video { display: none; } /* ukryj natywne video */
+    </style>
+  </head>
+  <body>
+    <a-scene embedded arjs="trackingMethod: best; sourceType: webcam;">
+
+      <!-- Wideo jako tekstura -->
+      <a-assets>
+        <video id="vid" src="video.webm" autoplay loop="true" playsinline webkit-playsinline muted></video>
+      </a-assets>
+
+      <!-- Marker (możesz zamienić na swój QR) -->
+      <a-marker type="pattern" url="marker.patt">
+        <a-plane src="#vid" position="0 0 0" rotation="-90 0 0" width="1" height="1"></a-plane>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
