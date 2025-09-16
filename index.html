@@ -65,7 +65,7 @@
       <a-assets>
         <video
           id="transparentVideo"
-          src="skelet.webm"
+          src="twoja-animacja.webm"
           autoplay
           loop="true"
           playsinline
@@ -76,40 +76,47 @@
         ></video>
       </a-assets>
 
-      <!-- Marker Hiro -->
+      <!-- Marker z przezroczystą animacją WebM - WIĘKSZA -->
       <a-marker preset="hiro" id="hiroMarker">
-        <!-- Płaszczyzna z przezroczystą animacją -->
+
+        <!-- Główna animacja - DUŻA płaszczyzna pionowa -->
         <a-plane
-          position="0 1 0"
+          position="0 2 0"
+          width="4"
+          height="4"
+          material="src: #transparentVideo; transparent: true; alphaTest: 0.05; side: double;"
+        ></a-plane>
+
+        <!-- Alternatywnie - jeszcze większa -->
+        <a-plane
+          position="0 0 0"
           rotation="-90 0 0"
-          width="2"
-          height="2"
-          material="src: #transparentVideo; transparent: true; alphaTest: 0.1; side: double;"
+          width="6"
+          height="6"
+          material="src: #transparentVideo; transparent: true; alphaTest: 0.05; side: double;"
+          visible="false"
         ></a-plane>
 
-        <!-- Alternatywna wersja - pionowa -->
-        <a-plane
-          position="0 2 -1"
-          width="2"
-          height="2"
-          material="src: #transparentVideo; transparent: true; alphaTest: 0.1; side: double;"
-        ></a-plane>
-
-        <!-- Opcja 3: Na cylindrze (jak hologram) -->
-        <a-cylinder
-          position="2 1 0"
-          radius="1"
-          height="2"
-          material="src: #transparentVideo; transparent: true; alphaTest: 0.1; side: double;"
-        ></a-cylinder>
-
-        <!-- Debug tekst -->
+        <!-- STABILNY tekst debug -->
         <a-text
-          value="Animacja WebM"
-          position="0 3 0"
+          value="WebM Animation"
+          position="0 4.5 0"
           align="center"
           color="white"
+          width="8"
+          geometry="primitive: plane; width: auto; height: auto"
+          material="color: black; opacity: 0.7"
         ></a-text>
+
+        <!-- Dodatkowy debug box żeby zobaczyć gdzie jest marker -->
+        <a-box
+          position="0 0.1 0"
+          width="0.2"
+          height="0.2"
+          depth="0.2"
+          material="color: red; opacity: 0.8"
+        ></a-box>
+
       </a-marker>
 
       <a-entity camera></a-entity>
@@ -207,7 +214,24 @@
         updateDebug('Inicjalizacja zakończona');
       });
 
-      // Timeout dla długiego ładowania
+      // Dodatkowy debug dla video
+      const video = document.getElementById('transparentVideo');
+      if (video) {
+        video.addEventListener('loadeddata', () => {
+          console.log('Video loaded:', video.videoWidth + 'x' + video.videoHeight);
+          updateDebug(`Video: ${video.videoWidth}x${video.videoHeight}`);
+        });
+
+        video.addEventListener('error', (e) => {
+          console.error('Video error:', e);
+          showError(`Video error: ${video.error ? video.error.message : 'Unknown'}`);
+        });
+
+        video.addEventListener('canplay', () => {
+          console.log('Video can play');
+          updateDebug('Video gotowe do odtwarzania');
+        });
+      }
       setTimeout(() => {
         if (debugDiv.textContent.includes('Ładowanie...')) {
           showError('Timeout - sprawdź połączenie i uprawnienia kamery');
