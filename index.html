@@ -4,6 +4,39 @@
     <title>AR Video - Debug</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
+        AFRAME.registerShader('transparent-video', {
+          schema: {
+            src: {type: 'map'},
+            opacity: {type: 'number', default: 1.0}
+          },
+
+          vertexShader: `
+            varying vec2 vUv;
+            void main() {
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+
+          fragmentShader: `
+            uniform sampler2D src;
+            uniform float opacity;
+            varying vec2 vUv;
+
+            void main() {
+              vec4 color = texture2D(src, vUv);
+
+              // Usuń czarne tło (dla green screen)
+              if (color.r < 0.1 && color.g < 0.1 && color.b < 0.1) {
+                discard;
+              }
+
+              gl_FragColor = vec4(color.rgb, color.a * opacity);
+            }
+          `
+        });
+    </script>
     <style>
       body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
       #debugInfo {
@@ -88,7 +121,8 @@
           rotation="0 0 0"
           width="3"
           height="3"
-          material="src: #transparentVideo;
+          material="shader: transparent-video;
+           src: #transparentVideo;
            transparent: true;
            opacity: 1.0;
            side: double;
