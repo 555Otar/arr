@@ -279,6 +279,42 @@
           showError('Timeout - sprawdź połączenie i uprawnienia kamery');
         }
       }, 15000);
+
+
+        // Czekaj aż A-Frame się załaduje
+        document.addEventListener('DOMContentLoaded', function() {
+          AFRAME.registerShader('transparent-video', {
+            schema: {
+              src: {type: 'map'},
+              opacity: {type: 'number', default: 1.0}
+            },
+
+            vertexShader: `
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+
+            fragmentShader: `
+              uniform sampler2D src;
+              uniform float opacity;
+              varying vec2 vUv;
+
+              void main() {
+                vec4 color = texture2D(src, vUv);
+
+                // Usuń czarne tło (dla green screen)
+                if (color.r < 0.1 && color.g < 0.1 && color.b < 0.1) {
+                  discard;
+                }
+
+                gl_FragColor = vec4(color.rgb, color.a * opacity);
+              }
+            `
+          });
+        });
     </script>
   </body>
 </html>
