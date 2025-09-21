@@ -4,39 +4,7 @@
     <title>AR Video - Debug</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script>
-        AFRAME.registerShader('transparent-video', {
-          schema: {
-            src: {type: 'map'},
-            opacity: {type: 'number', default: 1.0}
-          },
-
-          vertexShader: `
-            varying vec2 vUv;
-            void main() {
-              vUv = uv;
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-
-          fragmentShader: `
-            uniform sampler2D src;
-            uniform float opacity;
-            varying vec2 vUv;
-
-            void main() {
-              vec4 color = texture2D(src, vUv);
-
-              // Usuń czarne tło (dla green screen)
-              if (color.r < 0.1 && color.g < 0.1 && color.b < 0.1) {
-                discard;
-              }
-
-              gl_FragColor = vec4(color.rgb, color.a * opacity);
-            }
-          `
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/nikolaiwarner/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
     <style>
       body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
       #debugInfo {
@@ -98,7 +66,7 @@
       <a-assets>
         <video
           id="transparentVideo"
-          src="mine.webm"
+          src="mine_g.mp4"
           autoplay
           loop="true"
           playsinline
@@ -111,20 +79,15 @@
 
       <!-- Marker z przezroczystą animacją WebM - PROSTOPADŁA -->
       <a-marker preset="hiro" id="hiroMarker">
-
-        <!-- Główna animacja - PIONOWA płaszczyzna (prostopadła do ciebie) -->
-
-
           <a-plane
           id="plane2"
           position="0 2 0"
           width="3"
           height="3"
-          material="src: #transparentVideo;
-           shader: flat;
-           transparent: true;
-           alphaTest: 0.5;
-           side: double;"
+          material="shader: chromakey;
+            src: #transparentVideo;
+            color: 0 1 0;
+            side: double;"
         ></a-plane>
 
         <!-- Debug box na środku markera -->
@@ -142,10 +105,6 @@
     </a-scene>
 
     <script>
-
-
-
-
       // Debug i error handling
       let debugDiv = document.getElementById('debugInfo');
       let errorDiv = document.getElementById('errorLog');
@@ -279,35 +238,6 @@
           showError('Timeout - sprawdź połączenie i uprawnienia kamery');
         }
       }, 15000);
-
-
-        AFRAME.registerShader('transparent-video', {
-          schema: {
-            src: {type: 'map'},
-            opacity: {type: 'number', default: 1.0}
-          },
-
-          vertexShader: `
-            varying vec2 vUv;
-            void main() {
-              vUv = uv;
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-
-          fragmentShader: `
-            uniform sampler2D src;
-            uniform float opacity;
-            varying vec2 vUv;
-
-            void main() {
-              vec4 color = texture2D(src, vUv);
-
-              // Użyj natywnego kanału alfa z WEBM
-              gl_FragColor = vec4(color.rgb, color.a * opacity);
-            }
-          `
-        });
     </script>
   </body>
 </html>
