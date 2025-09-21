@@ -4,7 +4,39 @@
     <title>AR Video - Debug</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
+        AFRAME.registerShader('transparent-video', {
+          schema: {
+            src: {type: 'map'},
+            opacity: {type: 'number', default: 1.0}
+          },
 
+          vertexShader: `
+            varying vec2 vUv;
+            void main() {
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+
+          fragmentShader: `
+            uniform sampler2D src;
+            uniform float opacity;
+            varying vec2 vUv;
+
+            void main() {
+              vec4 color = texture2D(src, vUv);
+
+              // Usuń czarne tło (dla green screen)
+              if (color.r < 0.1 && color.g < 0.1 && color.b < 0.1) {
+                discard;
+              }
+
+              gl_FragColor = vec4(color.rgb, color.a * opacity);
+            }
+          `
+        });
+    </script>
     <style>
       body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
       #debugInfo {
@@ -86,17 +118,23 @@
           <a-plane
           id="plane2"
           position="0 2 0"
-          rotation="0 0 0"
           width="3"
           height="3"
-          material="shader: transparent-video;
-           src: #transparentVideo;
+          material="src: #transparentVideo;
+           shader: flat;
            transparent: true;
-           opacity: 1.0;
-           side: double;
-           alphaTest: 0.1;
-           blending: normal;"
+           alphaTest: 0.5;
+           side: double;"
         ></a-plane>
+
+        <!-- Debug box na środku markera -->
+        <a-box
+          position="0 0.1 0"
+          width="0.2"
+          height="0.2"
+          depth="0.2"
+          material="color: red; opacity: 0.8"
+        ></a-box>
 
       </a-marker>
 
@@ -104,6 +142,9 @@
     </a-scene>
 
     <script>
+
+
+
 
       // Debug i error handling
       let debugDiv = document.getElementById('debugInfo');
@@ -238,43 +279,6 @@
           showError('Timeout - sprawdź połączenie i uprawnienia kamery');
         }
       }, 15000);
-
-
-
-      // Czekaj aż A-Frame się załaduje
-    document.addEventListener('DOMContentLoaded', function() {
-      AFRAME.registerShader('transparent-video', {
-        schema: {
-          src: {type: 'map'},
-          opacity: {type: 'number', default: 1.0}
-        },
-
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-
-        fragmentShader: `
-          uniform sampler2D src;
-          uniform float opacity;
-          varying vec2 vUv;
-
-          void main() {
-            vec4 color = texture2D(src, vUv);
-
-            // Usuń czarne tło (dla green screen)
-            if (color.r < 0.1 && color.g < 0.1 && color.b < 0.1) {
-              discard;
-            }
-
-            gl_FragColor = vec4(color.rgb, color.a * opacity);
-          }
-        `
-      });
-    });
     </script>
   </body>
 </html>
