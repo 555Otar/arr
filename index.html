@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AR Video - Debug</title>
+    <title>AR Video</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/nikolaiwarner/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
@@ -97,42 +97,6 @@
     </a-scene>
 
     <script>
-      // Debug i error handling
-      let debugDiv = document.getElementById('debugInfo');
-      let errorDiv = document.getElementById('errorLog');
-      let errorText = document.getElementById('errorText');
-
-      function updateDebug(status) {
-        debugDiv.innerHTML = `
-          <div>Status: ${status}</div>
-          <div id="cameraStatus">Kamera: ${navigator.mediaDevices ? 'Dostępna' : 'Niedostępna'}</div>
-          <div id="arStatus">AR: ${status}</div>
-          <div>HTTPS: ${location.protocol === 'https:' ? 'TAK' : 'NIE'}</div>
-          <div>User Agent: ${navigator.userAgent.substr(0, 50)}...</div>
-        `;
-      }
-
-      function showError(message) {
-        errorText.textContent = message;
-        errorDiv.style.display = 'block';
-        console.error('AR Error:', message);
-      }
-
-      // Sprawdź dostęp do kamery
-      async function checkCameraAccess() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          console.log('Kamera dostępna');
-          stream.getTracks().forEach(track => track.stop());
-          updateDebug('Kamera OK');
-          return true;
-        } catch (error) {
-          console.error('Błąd kamery:', error);
-          showError(`Błąd kamery: ${error.message}`);
-          updateDebug('Błąd kamery');
-          return false;
-        }
-      }
 
       // Event listeners dla A-Frame i AR.js
       document.querySelector('a-scene').addEventListener('loaded', () => {
